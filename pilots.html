@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Enterprise Pilots & Safety ROI — SaniGuard</title>
+  <meta name="description" content="Calculate your enterprise safety ROI and request a 30-day SaniGuard IoT Safety Helmet evaluation pilot kit." />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            display: ['"Space Grotesk"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              400: '#fbbf24',
+              500: '#f59e0b',
+              dark: '#07090e',
+              surface: '#0c0f18',
+              card: '#111522',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="bg-brand-dark text-slate-200 antialiased overflow-x-hidden selection:bg-amber-400 selection:text-black">
+
+  <canvas id="ambient-canvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+
+  <!-- Minimalist Header -->
+  <header class="sticky top-0 z-40 backdrop-blur-xl bg-brand-dark/80 border-b border-white/5 transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 py-3.5 flex items-center justify-between">
+      
+      <a href="index.html" class="flex items-center gap-2.5 group" onclick="playBeep(700, 0.04)">
+        <div class="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center text-black font-bold pulse-glow-amber">
+          <i data-lucide="shield" class="w-4 h-4 stroke-[2.5]"></i>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="font-display font-bold text-lg tracking-tight text-white">Sani<span class="text-amber-400">Guard</span></span>
+          <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-white/5 text-slate-400 border border-white/10">IoT</span>
+        </div>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-1 text-xs font-medium text-slate-400 bg-white/5 p-1 rounded-full border border-white/5">
+        <a href="index.html" class="nav-link px-3.5 py-1.5 rounded-full hover:text-white transition" onclick="playBeep(600, 0.03)">Home</a>
+        <a href="introduction.html" class="nav-link px-3.5 py-1.5 rounded-full hover:text-white transition" onclick="playBeep(600, 0.03)">Introduction</a>
+        <a href="product.html" class="nav-link px-3.5 py-1.5 rounded-full hover:text-white transition" onclick="playBeep(600, 0.03)">Hardware</a>
+        <a href="technology.html" class="nav-link px-3.5 py-1.5 rounded-full hover:text-white transition" onclick="playBeep(600, 0.03)">Mesh & AI</a>
+        <a href="industries.html" class="nav-link px-3.5 py-1.5 rounded-full hover:text-white transition" onclick="playBeep(600, 0.03)">Industries</a>
+        <a href="simulator.html" class="nav-link px-3.5 py-1.5 rounded-full text-emerald-400 hover:text-emerald-300 transition flex items-center gap-1" onclick="playBeep(750, 0.04)">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Simulator
+        </a>
+        <a href="pilots.html" class="nav-link px-3.5 py-1.5 rounded-full hover:text-white transition" onclick="playBeep(600, 0.03)">ROI & Pilots</a>
+      </nav>
+
+      <div class="hidden lg:flex items-center gap-3">
+        <a href="#pilot-form" class="btn-shimmer px-4 py-2 rounded-full text-xs font-mono font-semibold bg-white text-black hover:bg-slate-200 transition">
+          Apply Now &rarr;
+        </a>
+      </div>
+
+      <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg text-slate-400 hover:text-white">
+        <i data-lucide="menu" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <div id="mobile-menu" class="hidden md:hidden border-b border-white/5 bg-brand-surface px-4 py-4 space-y-2 text-xs font-mono">
+      <a href="index.html" class="block py-1.5 text-slate-200">Home</a>
+      <a href="introduction.html" class="block py-1.5 text-slate-200">Introduction</a>
+      <a href="product.html" class="block py-1.5 text-slate-200">Hardware</a>
+      <a href="technology.html" class="block py-1.5 text-slate-200">Mesh & AI</a>
+      <a href="industries.html" class="block py-1.5 text-slate-200">Industries</a>
+      <a href="simulator.html" class="block py-1.5 text-emerald-400">Simulator</a>
+      <a href="pilots.html" class="block py-1.5 text-amber-400 font-bold">ROI & Pilots</a>
+    </div>
+  </header>
+
+  <!-- Title Header -->
+  <section class="py-14 text-center border-b border-white/5">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 reveal-on-scroll">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 mb-3 badge-floating">
+        <i data-lucide="calculator" class="w-3.5 h-3.5 text-amber-400"></i>
+        <span class="font-mono text-xs text-amber-300 uppercase tracking-wide">Enterprise Evaluation Program</span>
+      </div>
+      <h1 class="font-display font-extrabold text-3xl sm:text-4xl text-white">
+        Safety ROI & 30-Day Pilot
+      </h1>
+      <p class="text-slate-400 text-xs sm:text-sm mt-2">
+        Estimate your accident prevention savings and request evaluation units.
+      </p>
+    </div>
+  </section>
+
+  <!-- Clean ROI Calculator with 3D Tilt -->
+  <section class="py-14 relative z-10">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="card-tilt-3d p-6 sm:p-10 shadow-2xl">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+          
+          <div class="space-y-5">
+            <div>
+              <div class="flex justify-between text-xs font-mono mb-2">
+                <span class="text-slate-400">Workforce Size:</span>
+                <span id="calc-workers-label" class="text-white font-semibold">150 Workers</span>
+              </div>
+              <input id="calc-workers" type="range" min="20" max="1000" step="10" value="150" class="w-full accent-amber-500 cursor-pointer h-1.5 bg-white/10 rounded-lg">
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs font-mono mb-2">
+                <span class="text-slate-400">Site Risk Profile:</span>
+              </div>
+              <select id="calc-risk-level" class="w-full bg-black/40 border border-white/10 text-white rounded-lg px-3 py-2 text-xs font-mono focus:border-amber-500 focus:outline-none">
+                <option value="1.5">Moderate (Construction / Manufacturing)</option>
+                <option value="2.8" selected>High (Mining, Tunnels, Petrochem)</option>
+                <option value="4.2">Extreme (Offshore, HazMat, Chemical)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="bg-white/5 border border-white/10 rounded-xl p-6 space-y-4">
+            <div>
+              <div class="text-[10px] font-mono text-slate-400 uppercase">PROJECTED ACCIDENT REDUCTION</div>
+              <div id="calc-incident-drop" class="text-3xl font-display font-bold text-amber-400 mt-0.5">84.5%</div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 pt-3 border-t border-white/5 text-xs font-mono">
+              <div>
+                <div class="text-[10px] text-slate-500">RESPONSE TIME</div>
+                <div id="calc-response-time" class="text-sm font-semibold text-white mt-0.5">85% Faster</div>
+              </div>
+              <div>
+                <div class="text-[10px] text-slate-500">EST. SAVINGS</div>
+                <div id="calc-annual-savings" class="text-sm font-semibold text-emerald-400 mt-0.5">$385,000+</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Pilot Application Form -->
+  <section id="pilot-form" class="py-14 border-t border-white/5">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center mb-8">
+        <h2 class="font-display font-bold text-2xl text-white">Request Evaluation Pilot Kit</h2>
+        <p class="text-slate-400 text-xs mt-1 font-mono">Includes 5x Smart Helmets, 1x Mesh Gateway, and Cloud Access.</p>
+      </div>
+
+      <form class="space-y-4 card-tilt-3d p-6 sm:p-8" onsubmit="event.preventDefault(); document.getElementById('pilot-confirmation').classList.remove('hidden'); this.reset();">
+        
+        <div id="pilot-confirmation" class="hidden p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono">
+          ✓ Pilot request received. Our safety engineering team will reach out within 2 hours.
+        </div>
+
+        <div>
+          <label class="block text-xs font-mono text-slate-400 mb-1">Full Name</label>
+          <input type="text" required placeholder="Marcus Vance" class="w-full bg-black/40 border border-white/10 text-white rounded-lg px-3 py-2 text-xs focus:border-amber-500 focus:outline-none">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-mono text-slate-400 mb-1">Work Email</label>
+            <input type="email" required placeholder="name@company.com" class="w-full bg-black/40 border border-white/10 text-white rounded-lg px-3 py-2 text-xs focus:border-amber-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-mono text-slate-400 mb-1">Industry</label>
+            <select required class="w-full bg-black/40 border border-white/10 text-white rounded-lg px-3 py-2 text-xs focus:border-amber-500 focus:outline-none">
+              <option value="mining">Mining & Tunnels</option>
+              <option value="petro">Oil & Gas Refineries</option>
+              <option value="civil">Heavy Construction</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-shimmer w-full py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-mono font-semibold text-xs transition">
+          Submit Pilot Request &rarr;
+        </button>
+      </form>
+
+    </div>
+  </section>
+
+  <footer class="py-12 text-center text-xs font-mono text-slate-500">
+    &copy; 2026 SaniGuard Technologies Inc. Minimalist Enterprise Pilot.
+  </footer>
+
+  <script src="common.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

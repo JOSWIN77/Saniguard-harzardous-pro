@@ -1,0 +1,124 @@
+/* SMART SAFETY HELMET - LIVE TELEMETRY DASHBOARD & MODAL */
+/* ==========================================================================
+   17. LIVE SAFETY DASHBOARD SECTION & MODAL
+   ========================================================================== */
+.dashboard-frame {
+  background: linear-gradient(180deg, #0f172a 0%, #090e17 100%);
+  border: 1px solid var(--border-glow);
+  border-radius: var(--radius-xl);
+  padding: 2rem;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(250, 204, 21, 0.12);
+}
+
+.dashboard-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 1.5rem;
+}
+
+.dash-title-group {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.sim-badge-large {
+  background: rgba(250, 204, 21, 0.15);
+  border: 1px solid var(--safety-yellow);
+  color: var(--safety-yellow);
+  padding: 0.35rem 0.8rem;
+  border-radius: var(--radius-full);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.dash-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 1.8rem;
+}
+
+.dash-metric-card {
+  background: rgba(13, 18, 28, 0.7);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1.2rem;
+}
+
+.metric-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 0.3rem;
+}
+
+.metric-value {
+  font-size: 1.35rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: #ffffff;
+}
+
+.dash-main-split {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 1.5rem;
+}
+
+.worker-panel-card {
+  background: rgba(7, 9, 14, 0.6);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+}
+
+.worker-status-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.86rem;
+}
+
+.live-feed-card {
+  background: rgba(7, 9, 14, 0.6);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+}
+
+.feed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 240px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.feed-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
+}
+
+.feed-time {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.feed-msg {
+  color: #cbd5e1;
+}
+

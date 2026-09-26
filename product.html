@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hardware & Sensors — SaniGuard IoT Safety Helmet</title>
+  <meta name="description" content="Explore the physical engineering, quad-gas aspiration chamber, 6-axis IMU, and ATEX Zone 0 construction of SaniGuard." />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            display: ['"Space Grotesk"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              400: '#fbbf24',
+              500: '#f59e0b',
+              dark: '#07090e',
+              surface: '#0c0f18',
+              card: '#111522',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="bg-brand-dark text-slate-200 antialiased overflow-x-hidden selection:bg-amber-400 selection:text-black">
+
+  <canvas id="ambient-canvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+
+  <!-- Minimalist Header -->
+  <header class="sticky top-0 z-40 backdrop-blur-xl bg-brand-dark/80 border-b border-white/5 transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 py-3.5 flex items-center justify-between">
+      
+      <a href="index.html" class="flex items-center gap-2.5 group" onclick="playBeep(700, 0.04)">
+        <div class="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center text-black font-bold pulse-glow-amber">
+          <i data-lucide="shield" class="w-4 h-4 stroke-[2.5]"></i>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="font-display font-bold text-lg tracking-tight text-white">Sani<span class="text-amber-400">Guard</span></span>
+          <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-white/5 text-slate-400 border border-white/10">IoT</span>
+        </div>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-1 text-xs font-medium text-slate-400 bg-white/5 p-1 rounded-full border border-white/5">
+        <a href="index.html" class="nav-link px-3.5 py-1.5 rounded-full hover:text-white transition" onclick="playBeep(600, 0.03)">Home</a>
+        <a href="introduction.html" class="nav-link px-3.5 py-1.5 rounded-full hover:text-white transition" onclick="playBeep(600, 0.03)">Introduction</a>
+        <a href="product.html" class="nav-link px-3.5 py-1.5 rounded-full hover:text-white transition" onclick="playBeep(600, 0.03)">Hardware</a>
+        <a href="technology.html" class="nav-link px-3.5 py-1.5 rounded-full hover:text-white transition" onclick="playBeep(600, 0.03)">Mesh & AI</a>
+        <a href="industries.html" class="nav-link px-3.5 py-1.5 rounded-full hover:text-white transition" onclick="playBeep(600, 0.03)">Industries</a>
+        <a href="simulator.html" class="nav-link px-3.5 py-1.5 rounded-full text-emerald-400 hover:text-emerald-300 transition flex items-center gap-1" onclick="playBeep(750, 0.04)">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Simulator
+        </a>
+        <a href="pilots.html" class="nav-link px-3.5 py-1.5 rounded-full hover:text-white transition" onclick="playBeep(600, 0.03)">ROI & Pilots</a>
+      </nav>
+
+      <div class="hidden lg:flex items-center gap-3">
+        <a href="pilots.html" class="btn-shimmer px-4 py-2 rounded-full text-xs font-mono font-semibold bg-white text-black hover:bg-slate-200 transition">
+          Request Pilot Kit &rarr;
+        </a>
+      </div>
+
+      <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg text-slate-400 hover:text-white">
+        <i data-lucide="menu" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <div id="mobile-menu" class="hidden md:hidden border-b border-white/5 bg-brand-surface px-4 py-4 space-y-2 text-xs font-mono">
+      <a href="index.html" class="block py-1.5 text-slate-200">Home</a>
+      <a href="introduction.html" class="block py-1.5 text-slate-200">Introduction</a>
+      <a href="product.html" class="block py-1.5 text-amber-400 font-bold">Hardware</a>
+      <a href="technology.html" class="block py-1.5 text-slate-200">Mesh & AI</a>
+      <a href="industries.html" class="block py-1.5 text-slate-200">Industries</a>
+      <a href="simulator.html" class="block py-1.5 text-emerald-400">Simulator</a>
+      <a href="pilots.html" class="block py-1.5 text-slate-200">Pilots</a>
+    </div>
+  </header>
+
+  <!-- Title Header -->
+  <section class="py-14 text-center border-b border-white/5">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 reveal-on-scroll">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 mb-3 badge-floating">
+        <i data-lucide="cpu" class="w-3.5 h-3.5 text-amber-400"></i>
+        <span class="font-mono text-xs text-amber-300 uppercase tracking-wide">Hardware Architecture</span>
+      </div>
+      <h1 class="font-display font-extrabold text-3xl sm:text-4xl text-white">
+        Anatomy of SaniGuard
+      </h1>
+      <p class="text-slate-400 text-xs sm:text-sm mt-2">
+        Select numbered hotspots on the diagram to inspect component specifications.
+      </p>
+    </div>
+  </section>
+
+  <!-- Interactive Inspector with 3D Tilt and Laser Scan -->
+  <!-- Interactive 3D PBR Model Viewer & Exploded Assembly -->
+  <section class="py-10 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="card-tilt-3d p-6 sm:p-8 rounded-2xl shadow-2xl relative overflow-hidden border border-white/10">
+        
+        <!-- Top Toolbar -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 mb-4 border-b border-white/5 font-mono text-xs">
+          <div>
+            <span class="text-amber-400 font-semibold uppercase tracking-wider flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+              3D PBR Procedural Visualizer (Three.js)
+            </span>
+            <p class="text-slate-400 text-[11px] mt-0.5">Drag to rotate 360° &bull; Test multi-angle camera &bull; Explode internal electronics</p>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex flex-wrap items-center gap-2">
+            <!-- Explode Button -->
+            <button id="btn-explode" onclick="handleExplodeToggle(this)" class="btn-shimmer px-3.5 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 transition flex items-center gap-1.5 font-bold">
+              <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+              <span>Explode Layers</span>
+            </button>
+
+            <!-- Angle Selector -->
+            <div class="flex items-center bg-white/5 rounded-lg p-1 border border-white/10 text-[11px]">
+              <button onclick="window.setHelmetView && window.setHelmetView('perspective')" class="px-2 py-1 rounded hover:bg-white/10 text-slate-200">Perspective</button>
+              <button onclick="window.setHelmetView && window.setHelmetView('front')" class="px-2 py-1 rounded hover:bg-white/10 text-slate-200">Front</button>
+              <button onclick="window.setHelmetView && window.setHelmetView('side')" class="px-2 py-1 rounded hover:bg-white/10 text-slate-200">Side</button>
+              <button onclick="window.setHelmetView && window.setHelmetView('top')" class="px-2 py-1 rounded hover:bg-white/10 text-slate-200">Top</button>
+            </div>
+
+            <!-- Color Swatches -->
+            <div class="flex items-center gap-1.5 bg-white/5 px-2 py-1 rounded-lg border border-white/10">
+              <button onclick="window.setHelmetColor && window.setHelmetColor(0xf59e0b)" title="Safety Amber" class="w-4 h-4 rounded-full bg-amber-500 ring-2 ring-transparent hover:ring-white transition"></button>
+              <button onclick="window.setHelmetColor && window.setHelmetColor(0xea580c)" title="High-Vis Orange" class="w-4 h-4 rounded-full bg-orange-600 ring-2 ring-transparent hover:ring-white transition"></button>
+              <button onclick="window.setHelmetColor && window.setHelmetColor(0x1e293b)" title="Carbon Black" class="w-4 h-4 rounded-full bg-slate-800 ring-2 ring-transparent hover:ring-white transition"></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3D Viewport -->
+        <div class="w-full h-80 sm:h-[400px] rounded-xl bg-gradient-to-b from-brand-surface to-brand-dark flex items-center justify-center relative overflow-hidden" id="helmet-hero-canvas">
+          <!-- Three.js Canvas injected here -->
+        </div>
+
+        <!-- Layer Breakdown Footer -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 pt-4 mt-4 border-t border-white/5 text-[11px] font-mono text-slate-400">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+            <span>Layer 1: Carbon-ABS Outer Shell</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
+            <span>Layer 2: ESP32 + MPU6050 + Dosimeter</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-neutral-600"></span>
+            <span>Layer 3: EPS High-Density Foam</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-slate-700"></span>
+            <span>Layer 4: 4-Point Suspension Harness</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Interactive Hotspot Node Inspector -->
+  <section class="py-10 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center mb-8">
+        <h2 class="font-display font-bold text-2xl sm:text-3xl text-white">Sub-Assembly Node Inspector</h2>
+        <p class="text-slate-400 text-xs font-mono mt-1">Select numbered hotspots on the blueprint to inspect real-time specs</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        
+        <!-- Left Diagram -->
+        <div class="lg:col-span-7 card-tilt-3d p-6 flex flex-col items-center justify-center min-h-[420px] laser-scan-container helmet-interactive-view shadow-2xl">
+          
+          <div class="w-full flex items-center justify-between mb-4 text-xs font-mono text-slate-400">
+            <span>SCHEMATIC BLUEPRINT</span>
+            <span id="active-hotspot-label" class="text-amber-400 font-semibold">1. Quad-Gas Aspiration Chamber</span>
+          </div>
+
+          <div class="relative w-full max-w-md aspect-[4/3] flex items-center justify-center">
+            <svg viewBox="0 0 500 380" class="w-full h-full filter drop-shadow-[0_15px_25px_rgba(0,0,0,0.9)]" xmlns="http://www.w3.org/2000/svg">
+              <path d="M 80 250 C 80 90, 420 90, 420 250 C 420 270, 400 290, 370 290 L 130 290 C 100 290, 80 270, 80 250 Z" fill="#131722" stroke="#334155" stroke-width="3" />
+              <path d="M 120 160 C 180 110, 320 110, 380 160 C 350 200, 150 200, 120 160 Z" fill="#090a0f" stroke="#f59e0b" stroke-width="1.5" />
+              <path d="M 100 220 C 130 180, 370 180, 400 220 L 380 270 C 330 300, 170 300, 120 270 Z" fill="#082f49" stroke="#06b6d4" stroke-width="1.5" opacity="0.8" />
+              <rect x="230" y="70" width="40" height="24" rx="6" fill="#f59e0b" />
+              <rect x="70" y="220" width="30" height="50" rx="4" fill="#090a0f" stroke="#334155" stroke-width="1.5" />
+              <line x1="410" y1="210" x2="450" y2="130" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+
+            <!-- Hotspots -->
+            <button class="hotspot-btn absolute bottom-1/4 left-1/2 -translate-x-1/2 active" data-spot="gas" onclick="playBeep(700, 0.04)">1</button>
+            <button class="hotspot-btn absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-4" data-spot="hud" onclick="playBeep(750, 0.04)">2</button>
+            <button class="hotspot-btn absolute top-12 left-1/2 -translate-x-1/2" data-spot="strobe" onclick="playBeep(800, 0.04)">3</button>
+            <button class="hotspot-btn absolute top-1/4 right-8" data-spot="mesh" onclick="playBeep(850, 0.04)">4</button>
+            <button class="hotspot-btn absolute bottom-1/3 left-10" data-spot="battery" onclick="playBeep(650, 0.04)">5</button>
+          </div>
+
+          <p class="text-[11px] text-slate-500 font-mono text-center mt-2">Select numbered nodes (1-5)</p>
+        </div>
+
+        <!-- Right Spec Card -->
+        <div class="lg:col-span-5">
+          <div id="hotspot-detail-card" class="card-tilt-3d p-7 space-y-5 shadow-2xl">
+            
+            <div class="flex items-center justify-between text-xs font-mono">
+              <span id="spot-category" class="text-amber-400 font-semibold">ATMOSPHERIC SENSOR</span>
+              <span id="spot-code" class="text-slate-500">NODE-GAS-01</span>
+            </div>
+
+            <h3 id="spot-title" class="font-display font-bold text-xl text-white">
+              Quad-Gas Micro-Aspiration Chamber
+            </h3>
+
+            <p id="spot-desc" class="text-slate-400 text-xs leading-relaxed">
+              Continuously draws ambient air across NDIR optical and electrochemical sensor cells detecting CH4, H2S, CO, and O2 starvation in 100 milliseconds.
+            </p>
+
+            <div class="grid grid-cols-2 gap-3 text-xs font-mono pt-2">
+              <div class="bg-white/5 p-3 rounded-lg border border-white/5">
+                <div class="text-[10px] text-slate-500">RESPONSE</div>
+                <div id="spot-stat-1" class="text-white font-semibold mt-0.5">&lt; 100ms</div>
+              </div>
+              <div class="bg-white/5 p-3 rounded-lg border border-white/5">
+                <div class="text-[10px] text-slate-500">SENSITIVITY</div>
+                <div id="spot-stat-2" class="text-white font-semibold mt-0.5">0.1 PPM</div>
+              </div>
+              <div class="bg-white/5 p-3 rounded-lg border border-white/5">
+                <div class="text-[10px] text-slate-500">CALIBRATION</div>
+                <div id="spot-stat-3" class="text-white font-semibold mt-0.5">Self-Zeroing</div>
+              </div>
+              <div class="bg-white/5 p-3 rounded-lg border border-white/5">
+                <div class="text-[10px] text-slate-500">RATING</div>
+                <div id="spot-stat-4" class="text-amber-400 font-semibold mt-0.5">ATEX Zone 0</div>
+              </div>
+            </div>
+
+            <div class="pt-2">
+              <a href="simulator.html" class="btn-shimmer w-full py-2.5 rounded-lg bg-white/5 hover:bg-white/10 text-white text-xs font-mono flex items-center justify-center gap-2 transition border border-white/10" onclick="playBeep(750, 0.04)">
+                Test in Live Simulator &rarr;
+              </a>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Spec Table -->
+  <section class="py-14 border-t border-white/5">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center mb-8">
+        <h2 class="font-display font-bold text-2xl text-white">Full Specifications</h2>
+      </div>
+
+      <div class="card-tilt-3d p-6 font-mono text-xs divide-y divide-white/5 space-y-3">
+        <div class="flex justify-between pb-2">
+          <span class="text-slate-400">Total Helmet Weight</span>
+          <span class="text-white font-semibold">580 grams (incl. battery)</span>
+        </div>
+        <div class="flex justify-between py-2">
+          <span class="text-slate-400">Gases Detected</span>
+          <span class="text-amber-400 font-semibold">CH₄ (LEL), H₂S, CO, O₂</span>
+        </div>
+        <div class="flex justify-between py-2">
+          <span class="text-slate-400">Impact Sensor</span>
+          <span class="text-white font-semibold">6-Axis IMU (±16G range)</span>
+        </div>
+        <div class="flex justify-between py-2">
+          <span class="text-slate-400">Mesh Connectivity</span>
+          <span class="text-emerald-400 font-semibold">Sub-GHz LoRaWAN + UWB</span>
+        </div>
+        <div class="flex justify-between py-2">
+          <span class="text-slate-400">Battery Runtime</span>
+          <span class="text-white font-semibold">48 Hours (LiFePO4 Hot-Swap)</span>
+        </div>
+        <div class="flex justify-between pt-2">
+          <span class="text-slate-400">Certifications</span>
+          <span class="text-white font-semibold">ATEX Zone 0 (Ex ia), OSHA 1926.100, ANSI Z89.1</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="py-12 text-center text-xs font-mono text-slate-500">
+    &copy; 2026 SaniGuard Technologies Inc. Minimalist Hardware Architecture.
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="common.js"></script>
+  <script src="helmet3d.js"></script>
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.initHelmet3D) {
+        window.initHelmet3D('helmet-hero-canvas');
+      }
+    });
+
+    function handleExplodeToggle(btn) {
+      if (window.toggleHelmetExplode) {
+        const isExploded = window.toggleHelmetExplode();
+        const span = btn.querySelector('span');
+        if (span) {
+          span.textContent = isExploded ? 'Assemble Layers' : 'Explode Layers';
+        }
+        btn.classList.toggle('bg-amber-500/40', isExploded);
+      }
+    }
+  </script>
+</body>
+</html>

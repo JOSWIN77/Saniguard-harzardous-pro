@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Target Industries — SaniGuard IoT Safety Helmet</title>
+  <meta name="description" content="Discover how SaniGuard safeguards workers across underground mining, petrochemical refineries, heavy civil construction, and HazMat." />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            display: ['"Space Grotesk"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              400: '#fbbf24',
+              500: '#f59e0b',
+              dark: '#07090e',
+              surface: '#0c0f18',
+              card: '#111522',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="bg-brand-dark text-slate-200 antialiased overflow-x-hidden selection:bg-amber-400 selection:text-black">
+
+  <canvas id="ambient-canvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+
+  <!-- Minimalist Header -->
+  <header class="sticky top-0 z-40 backdrop-blur-xl bg-brand-dark/80 border-b border-white/5 transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 py-3.5 flex items-center justify-between">
+      
+      <a href="index.html" class="flex items-center gap-2.5 group" onclick="playBeep(700, 0.04)">
+        <div class="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center text-black font-bold pulse-glow-amber">
+          <i data-lucide="shield" class="w-4 h-4 stroke-[2.5]"></i>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="font-display font-bold text-lg tracking-tight text-white">Sani<span class="text-amber-400">Guard</span></span>
+          <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-white/5 text-slate-400 border border-white/10">IoT</span>
+        </div>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-1 text-xs font-medium text-slate-400 bg-white/5 p-1 rounded-full border border-white/5">
+        <a href="index.html" class="nav-link px-3.5 py-1.5 rounded-full hover:text-white transition" onclick="playBeep(600, 0.03)">Home</a>
+        <a href="introduction.html" class="nav-link px-3.5 py-1.5 rounded-full hover:text-white transition" onclick="playBeep(600, 0.03)">Introduction</a>
+        <a href="product.html" class="nav-link px-3.5 py-1.5 rounded-full hover:text-white transition" onclick="playBeep(600, 0.03)">Hardware</a>
+        <a href="technology.html" class="nav-link px-3.5 py-1.5 rounded-full hover:text-white transition" onclick="playBeep(600, 0.03)">Mesh & AI</a>
+        <a href="industries.html" class="nav-link px-3.5 py-1.5 rounded-full hover:text-white transition" onclick="playBeep(600, 0.03)">Industries</a>
+        <a href="simulator.html" class="nav-link px-3.5 py-1.5 rounded-full text-emerald-400 hover:text-emerald-300 transition flex items-center gap-1" onclick="playBeep(750, 0.04)">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Simulator
+        </a>
+        <a href="pilots.html" class="nav-link px-3.5 py-1.5 rounded-full hover:text-white transition" onclick="playBeep(600, 0.03)">ROI & Pilots</a>
+      </nav>
+
+      <div class="hidden lg:flex items-center gap-3">
+        <a href="pilots.html" class="btn-shimmer px-4 py-2 rounded-full text-xs font-mono font-semibold bg-white text-black hover:bg-slate-200 transition">
+          Request Pilot Kit &rarr;
+        </a>
+      </div>
+
+      <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg text-slate-400 hover:text-white">
+        <i data-lucide="menu" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <div id="mobile-menu" class="hidden md:hidden border-b border-white/5 bg-brand-surface px-4 py-4 space-y-2 text-xs font-mono">
+      <a href="index.html" class="block py-1.5 text-slate-200">Home</a>
+      <a href="introduction.html" class="block py-1.5 text-slate-200">Introduction</a>
+      <a href="product.html" class="block py-1.5 text-slate-200">Hardware</a>
+      <a href="technology.html" class="block py-1.5 text-slate-200">Mesh & AI</a>
+      <a href="industries.html" class="block py-1.5 text-amber-400 font-bold">Industries</a>
+      <a href="simulator.html" class="block py-1.5 text-emerald-400">Simulator</a>
+      <a href="pilots.html" class="block py-1.5 text-slate-200">Pilots</a>
+    </div>
+  </header>
+
+  <!-- Title Header -->
+  <section class="py-14 text-center border-b border-white/5">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 reveal-on-scroll">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 mb-3 badge-floating">
+        <i data-lucide="hard-hat" class="w-3.5 h-3.5 text-amber-400"></i>
+        <span class="font-mono text-xs text-amber-300 uppercase tracking-wide">Hazardous Sector Deployments</span>
+      </div>
+      <h1 class="font-display font-extrabold text-3xl sm:text-4xl text-white">
+        Industry Solutions
+      </h1>
+      <p class="text-slate-400 text-xs sm:text-sm mt-2">
+        Specific threat mitigation engineered for extreme worksites.
+      </p>
+    </div>
+  </section>
+
+  <!-- Clean Industry Cards with 3D Tilt -->
+  <section class="py-14 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+      
+      <div class="card-tilt-3d p-6 sm:p-8">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div class="space-y-2 max-w-2xl">
+            <span class="text-xs font-mono text-amber-400 font-semibold">DEEP MINING & TUNNELING</span>
+            <h2 class="font-display font-bold text-xl text-white">Subterranean Rock Penetration</h2>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Methane outbursts and collapses trap workers where GPS cannot reach. SaniGuard uses Sub-GHz mesh hopping to maintain worker location and air quality telemetry.
+            </p>
+          </div>
+          <div class="text-right font-mono text-xs text-slate-400">
+            <div class="text-2xl font-bold text-white font-display">92% Faster</div>
+            <div>Rescue reaction time</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-tilt-3d p-6 sm:p-8">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div class="space-y-2 max-w-2xl">
+            <span class="text-xs font-mono text-cyan-400 font-semibold">OIL & GAS REFINERIES</span>
+            <h2 class="font-display font-bold text-xl text-white">Confined Processing Columns & H₂S</h2>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Hydrogen Sulfide deadens smell at low PPM. ATEX Zone 0 (Ex ia IIC T4 Ga) certification ensures zero spark hazard in explosive environments.
+            </p>
+          </div>
+          <div class="text-right font-mono text-xs text-slate-400">
+            <div class="text-2xl font-bold text-white font-display">ATEX Zone 0</div>
+            <div>Intrinsically safe</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-tilt-3d p-6 sm:p-8">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div class="space-y-2 max-w-2xl">
+            <span class="text-xs font-mono text-rose-400 font-semibold">CIVIL SCAFFOLDING & HIGH-RISE</span>
+            <h2 class="font-display font-bold text-xl text-white">Fall Impact & Heat Stress</h2>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              6-Axis IMU detects free-fall impact with immediate 0.2s SOS coordinates to control rooms, while forehead infrared sensors track heat exhaustion risk.
+            </p>
+          </div>
+          <div class="text-right font-mono text-xs text-slate-400">
+            <div class="text-2xl font-bold text-white font-display">0.2s SOS</div>
+            <div>Automated dispatch</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="py-12 text-center text-xs font-mono text-slate-500">
+    &copy; 2026 SaniGuard Technologies Inc. Minimalist Industry Solutions.
+  </footer>
+
+  <script src="common.js"></script>
+</body>
+</html>

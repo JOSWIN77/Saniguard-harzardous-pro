@@ -1,0 +1,440 @@
+/* SMART SAFETY HELMET - INTERACTIVE SENSORS, FALL & RADIATION SIMULATORS */
+/* ==========================================================================
+   11. MOTION SENSOR & FALL DETECTION
+   ========================================================================== */
+.fall-section-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+}
+
+.fall-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+.axes-diagram-wrap {
+  background: #090e17;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  position: relative;
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.axes-visualizer-canvas {
+  width: 100%;
+  height: 220px;
+  position: relative;
+}
+
+.axes-legend {
+  display: flex;
+  justify-content: space-around;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.axis-badge {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.axis-badge.x { color: #ef4444; }
+.axis-badge.y { color: #10b981; }
+.axis-badge.z { color: #3b82f6; }
+
+/* 4 Fall States */
+.fall-states-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin: 2.5rem 0;
+}
+
+.fall-state-card {
+  background: rgba(13, 18, 28, 0.7);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  text-align: center;
+  transition: all var(--transition-fast);
+}
+
+.fall-state-card.normal { border-top: 3px solid var(--status-safe); }
+.fall-state-card.abnormal { border-top: 3px solid var(--safety-yellow); }
+.fall-state-card.impact { border-top: 3px solid var(--status-warning); }
+.fall-state-card.fall { border-top: 3px solid var(--status-danger); }
+
+.fall-state-card.active {
+  background: rgba(23, 33, 54, 0.95);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+  transform: translateY(-4px);
+}
+
+.fall-state-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  margin-top: 0.6rem;
+  font-family: var(--font-mono);
+}
+
+/* Fall Sequence Workflow */
+.fall-sequence-flow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  background: rgba(7, 9, 14, 0.6);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  overflow-x: auto;
+  margin-bottom: 2rem;
+}
+
+.sequence-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-width: 110px;
+  position: relative;
+}
+
+.sequence-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #cbd5e1;
+  margin-bottom: 0.5rem;
+  transition: all var(--transition-fast);
+}
+
+.sequence-step.active .sequence-icon {
+  background: var(--status-danger);
+  border-color: var(--status-danger);
+  color: #ffffff;
+  box-shadow: 0 0 15px var(--status-danger);
+}
+
+.sequence-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.sequence-arrow {
+  color: var(--text-muted);
+  font-size: 1.2rem;
+}
+
+
+
+/* ==========================================================================
+   13. RADIATION SAFETY SECTION (CRITICAL)
+   ========================================================================== */
+.radiation-section-wrapper {
+  background: radial-gradient(circle at 50% 20%, rgba(239, 68, 68, 0.06) 0%, transparent 70%);
+  border-top: 1px solid rgba(239, 68, 68, 0.2);
+  border-bottom: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.radiation-dashboard-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-xl);
+  padding: 2.5rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+  margin-bottom: 3rem;
+}
+
+.radiation-states-display {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.radiation-state-box {
+  background: rgba(7, 9, 14, 0.7);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  transition: all var(--transition-fast);
+}
+
+.radiation-state-box.safe { border-left: 4px solid var(--status-safe); }
+.radiation-state-box.warning { border-left: 4px solid var(--status-warning); }
+.radiation-state-box.danger { border-left: 4px solid var(--status-danger); }
+
+.radiation-state-box.active {
+  background: rgba(23, 33, 54, 0.95);
+  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.08);
+}
+
+.radiation-state-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+  font-family: var(--font-mono);
+}
+
+.radiation-state-box.safe .radiation-state-title { color: var(--status-safe); }
+.radiation-state-box.warning .radiation-state-title { color: var(--status-warning); }
+.radiation-state-box.danger .radiation-state-title { color: var(--status-danger); }
+
+.radiation-state-desc {
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Interactive Radiation Simulator Slider */
+.radiation-simulator-wrap {
+  background: rgba(13, 18, 28, 0.9);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.8rem;
+  margin: 2rem 0;
+}
+
+.sim-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.sim-slider {
+  flex-grow: 1;
+  -webkit-appearance: none;
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(to right, var(--status-safe), var(--status-warning) 50%, var(--status-danger));
+  outline: none;
+}
+
+.sim-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid var(--bg-primary);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.sim-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.sim-readout {
+  font-family: var(--font-mono);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--safety-yellow);
+  min-width: 140px;
+  text-align: right;
+}
+
+/* Mandatory Radiation Disclaimers */
+.radiation-disclaimer-box {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-radius: var(--radius-lg);
+  padding: 1.8rem;
+  margin-top: 2rem;
+}
+
+.radiation-disclaimer-box h4 {
+  color: var(--status-danger);
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.8rem;
+}
+
+.radiation-disclaimer-box ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+  color: #cbd5e1;
+}
+
+.radiation-disclaimer-box li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.radiation-disclaimer-box li::before {
+  content: '⚠';
+  color: var(--status-danger);
+  font-weight: bold;
+}
+
+/* Timeline 01-07 */
+.timeline-7steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-top: 2.5rem;
+}
+
+.timeline-step-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  position: relative;
+  transition: all var(--transition-fast);
+}
+
+.timeline-step-card:hover {
+  border-color: var(--iot-cyan);
+  transform: translateY(-3px);
+}
+
+.step-num {
+  font-family: var(--font-mono);
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--iot-cyan);
+  margin-bottom: 0.4rem;
+}
+
+.step-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.step-desc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* ==========================================================================
+   14. ACCIDENT EMERGENCY SYSTEM
+   ========================================================================== */
+.emergency-system-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: 2.5rem;
+}
+
+.triggers-flow-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1.2fr auto 1fr;
+  gap: 1.5rem;
+  align-items: center;
+  margin: 2.5rem 0;
+}
+
+.triggers-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.trigger-badge {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: #cbd5e1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.flow-connector {
+  color: var(--safety-yellow);
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.controller-hub-box {
+  background: linear-gradient(135deg, rgba(250, 204, 21, 0.1), rgba(13, 18, 28, 0.9));
+  border: 1px solid var(--safety-yellow);
+  border-radius: var(--radius-lg);
+  padding: 1.8rem;
+  text-align: center;
+  box-shadow: 0 0 25px rgba(250, 204, 21, 0.2);
+}
+
+.hub-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--safety-yellow);
+  margin-bottom: 0.5rem;
+}
+
+.hub-desc {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+/* Simulation Alert Popup Box */
+.sim-alert-banner {
+  background: rgba(239, 68, 68, 0.15);
+  border: 2px solid var(--status-danger);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2rem;
+  box-shadow: 0 0 30px rgba(239, 68, 68, 0.35);
+  animation: pulse-danger 2s infinite;
+}
+
+.sim-alert-details h4 {
+  color: #ffffff;
+  font-size: 1.25rem;
+  margin-bottom: 0.3rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.sim-alert-meta {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: #fca5a5;
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 0.4rem;
+}
+

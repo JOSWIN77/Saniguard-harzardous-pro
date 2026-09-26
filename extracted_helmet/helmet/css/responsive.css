@@ -1,0 +1,90 @@
+/* SMART SAFETY HELMET - RESPONSIVE MEDIA QUERIES */
+/* ==========================================================================
+   23. RESPONSIVE MEDIA QUERIES
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .hero-grid {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+  
+  .problem-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .stat-item:not(:last-child)::after {
+    display: none;
+  }
+  
+  .solution-interactive-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .fall-grid, .ergonomics-grid, .dash-main-split {
+    grid-template-columns: 1fr;
+  }
+  
+  .triggers-flow-grid {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  
+  .future-roadmap-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .footer-top-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .nav-links, .nav-btn-dashboard {
+    display: none;
+  }
+  
+  .nav-toggle-btn {
+    display: flex;
+  }
+  
+  /* Mobile Menu Drawer */
+  .mobile-menu-drawer {
+    position: fixed;
+    top: var(--nav-height);
+    left: 0;
+    right: 0;
+    background: rgba(7, 9, 14, 0.98);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 2rem;
+    display: none;
+    flex-direction: column;
+    gap: 1.25rem;
+    z-index: 999;
+  }
+  
+  .mobile-menu-drawer.open {
+    display: flex;
+  }
+  
+  .problem-grid, .fall-states-grid, .radiation-states-display, .wear-states-grid, .dash-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .schematic-features-grid, .balance-comparison-wrap, .future-roadmap-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .footer-top-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .section-padding {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+}

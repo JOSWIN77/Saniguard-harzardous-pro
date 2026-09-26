@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mission Control 3D Simulator — SaniGuard IoT Safety Center</title>
+  <meta name="description" content="Simulate real-time worker telemetry, MPU6050 6-axis motion, 3D helmet physics, toxic gas leaks, radiation dosimeter, high-G falls, and emergency SOS dispatch in SaniGuard Mission Control." />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            display: ['"Space Grotesk"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              400: '#fbbf24',
+              500: '#f59e0b',
+              dark: '#07090e',
+              surface: '#0c0f18',
+              card: '#111522',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="bg-brand-dark text-slate-200 antialiased overflow-x-hidden selection:bg-amber-400 selection:text-black">
+
+  <canvas id="ambient-canvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+
+  <!-- Minimalist Header -->
+  <header class="sticky top-0 z-40 backdrop-blur-xl bg-brand-dark/80 border-b border-white/5 transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 py-3.5 flex items-center justify-between">
+      
+      <a href="index.html" class="flex items-center gap-2.5 group" onclick="playBeep(700, 0.04)">
+        <div class="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center text-black font-bold pulse-glow-amber">
+          <i data-lucide="shield" class="w-4 h-4 stroke-[2.5]"></i>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="font-display font-bold text-lg tracking-tight text-white">Sani<span class="text-amber-400">Guard</span></span>
+          <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-white/5 text-slate-400 border border-white/10">IoT</span>
+        </div>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-1 text-xs font-medium text-slate-400 bg-white/5 p-1 rounded-full border border-white/5">
+        <a href="index.html" class="nav-link px-3.5 py-1.5 rounded-full hover:text-white transition" onclick="playBeep(600, 0.03)">Home</a>
+        <a href="introduction.html" class="nav-link px-3.5 py-1.5 rounded-full hover:text-white transition" onclick="playBeep(600, 0.03)">Introduction</a>
+        <a href="product.html" class="nav-link px-3.5 py-1.5 rounded-full hover:text-white transition" onclick="playBeep(600, 0.03)">Hardware</a>
+        <a href="technology.html" class="nav-link px-3.5 py-1.5 rounded-full hover:text-white transition" onclick="playBeep(600, 0.03)">Mesh & AI</a>
+        <a href="industries.html" class="nav-link px-3.5 py-1.5 rounded-full hover:text-white transition" onclick="playBeep(600, 0.03)">Industries</a>
+        <a href="simulator.html" class="nav-link px-3.5 py-1.5 rounded-full text-emerald-400 font-semibold hover:text-emerald-300 transition flex items-center gap-1" onclick="playBeep(750, 0.04)">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Live 3D Simulator
+        </a>
+      </nav>
+
+      <div class="hidden lg:flex items-center gap-3">
+        <button id="sound-toggle-btn" class="px-3 py-1.5 rounded-full text-xs font-mono text-amber-400 hover:text-white bg-white/5 border border-white/5 transition flex items-center gap-1.5">
+          <i data-lucide="volume-2" class="w-3.5 h-3.5"></i> Audio: ON
+        </button>
+        <span class="px-3 py-1.5 rounded-full text-xs font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> 10Hz Mesh Stream Active
+        </span>
+      </div>
+
+      <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg text-slate-400 hover:text-white">
+        <i data-lucide="menu" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <div id="mobile-menu" class="hidden md:hidden border-b border-white/5 bg-brand-surface px-4 py-4 space-y-2 text-xs font-mono">
+      <a href="index.html" class="block py-1.5 text-slate-200">Home</a>
+      <a href="introduction.html" class="block py-1.5 text-slate-200">Introduction</a>
+      <a href="product.html" class="block py-1.5 text-slate-200">Hardware</a>
+      <a href="technology.html" class="block py-1.5 text-slate-200">Mesh & AI</a>
+      <a href="industries.html" class="block py-1.5 text-slate-200">Industries</a>
+      <a href="simulator.html" class="block py-1.5 text-emerald-400 font-bold">Live 3D Simulator</a>
+    </div>
+  </header>
+
+  <!-- Simulator Top Controls & MPU6050 Motion Presets -->
+  <section class="py-6 border-b border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-2 text-xs font-mono text-slate-400">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span>REAL-TIME WORKER TELEMETRY // <strong>SECTOR-7 (DEEP MINE -400M)</strong></span>
+            <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-mono ml-2 border border-emerald-500/20">CAPACITIVE WEAR: ACTIVE</span>
+          </div>
+          <h1 class="font-display font-bold text-xl sm:text-2xl text-white mt-1">
+            Worker Unit: <span class="text-amber-400">SW-001 (M. Ramirez)</span>
+          </h1>
+        </div>
+
+        <!-- MPU6050 Motion Presets (From BuildX Module) -->
+        <div class="flex flex-wrap items-center gap-2 text-xs font-mono">
+          <span class="text-slate-400 mr-1 text-[11px]">MOTION SCENARIO:</span>
+          <button onclick="setMotionPreset('NORMAL', this)" class="motion-btn btn-shimmer px-3 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 hover:bg-emerald-500/30 transition">
+            NORMAL (1.0g)
+          </button>
+          <button onclick="setMotionPreset('WALKING', this)" class="motion-btn btn-shimmer px-3 py-1.5 rounded-lg bg-white/5 text-blue-400 border border-white/10 hover:bg-white/10 transition">
+            WALKING (1.4g)
+          </button>
+          <button onclick="setMotionPreset('IMPACT', this)" class="motion-btn btn-shimmer px-3 py-1.5 rounded-lg bg-white/5 text-amber-400 border border-white/10 hover:bg-white/10 transition">
+            IMPACT (2.8g)
+          </button>
+          <button onclick="setMotionPreset('FALL', this)" class="motion-btn btn-shimmer px-3 py-1.5 rounded-lg bg-white/5 text-rose-400 border border-white/10 hover:bg-white/10 transition">
+            FALL (3.8g)
+          </button>
+          <button onclick="setMotionPreset('NO_MOVEMENT', this)" class="motion-btn btn-shimmer px-3 py-1.5 rounded-lg bg-white/5 text-purple-400 border border-white/10 hover:bg-white/10 transition">
+            NO MOVEMENT
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3-Column Dashboard Grid: Sensors | Live Waveform | 3D Helmet Simulation Viewport -->
+  <section class="py-6 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        
+        <!-- LEFT COLUMN: Live Sensor Gauges (4 cols) -->
+        <div class="lg:col-span-4 space-y-4">
+          
+          <!-- MPU-6050 Motion & 6-Axis Vectors -->
+          <div class="card-tilt-3d p-4 border border-white/5 rounded-xl">
+            <div class="flex items-center justify-between text-xs font-mono mb-2">
+              <span class="text-slate-400 flex items-center gap-1.5"><i data-lucide="activity" class="w-3.5 h-3.5 text-amber-400"></i> MPU6050 6-AXIS IMU</span>
+              <span id="motion-state-badge" class="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">STATE: NORMAL</span>
+            </div>
+            <div class="flex items-baseline justify-between">
+              <span id="impact-value" class="text-2xl font-display font-bold text-white">1.02 <span class="text-xs text-slate-500">G</span></span>
+              <span id="orientation-text" class="text-[10px] font-mono text-emerald-400 font-semibold">ORIENTATION: NORMAL</span>
+            </div>
+            
+            <!-- 3-Axis Live Output Meters -->
+            <div class="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-white/5 text-[10px] font-mono">
+              <div class="bg-white/5 p-2 rounded text-center">
+                <span class="text-slate-500">AX: </span><span id="ax-val" class="text-white">0.02g</span>
+              </div>
+              <div class="bg-white/5 p-2 rounded text-center">
+                <span class="text-slate-500">AY: </span><span id="ay-val" class="text-white">0.04g</span>
+              </div>
+              <div class="bg-white/5 p-2 rounded text-center">
+                <span class="text-slate-500">AZ: </span><span id="az-val" class="text-white">1.01g</span>
+              </div>
+            </div>
+
+            <!-- Pitch & Roll Gyro Output -->
+            <div class="flex justify-between items-center mt-2 text-[10px] font-mono text-slate-400 px-1">
+              <span>Pitch: <strong id="pitch-val" class="text-white">1°</strong> | Roll: <strong id="roll-val" class="text-white">2°</strong></span>
+              <span id="impact-flag" class="text-slate-500">Impact: NO</span>
+            </div>
+          </div>
+
+          <!-- Toxic Gas Chamber Card -->
+          <div class="card-tilt-3d p-4 border border-white/5 rounded-xl">
+            <div class="flex items-center justify-between text-xs font-mono mb-2">
+              <span class="text-slate-400 flex items-center gap-1.5"><i data-lucide="wind" class="w-3.5 h-3.5 text-cyan-400"></i> TOXIC H₂S & CH₄ GAS</span>
+              <span id="gas-status-badge" class="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">0.4 PPM</span>
+            </div>
+            <div class="flex items-baseline justify-between">
+              <span id="gas-value" class="text-2xl font-display font-bold text-white">0.4 <span class="text-xs text-slate-500">PPM</span></span>
+              <button onclick="triggerGasSpike()" class="text-[10px] font-mono text-cyan-400 hover:text-cyan-300 underline">
+                Simulate Spike &rarr;
+              </button>
+            </div>
+            <div class="w-full bg-white/5 rounded-full h-1.5 mt-3 overflow-hidden">
+              <div id="gas-bar" class="bg-cyan-400 h-full rounded-full transition-all duration-300" style="width: 4%"></div>
+            </div>
+          </div>
+
+          <!-- Radiation Dosimeter & Vitals Card -->
+          <div class="card-tilt-3d p-4 border border-white/5 rounded-xl">
+            <div class="flex items-center justify-between text-xs font-mono mb-2">
+              <span class="text-slate-400 flex items-center gap-1.5"><i data-lucide="radio" class="w-3.5 h-3.5 text-rose-400"></i> RADIATION & BIOMETRICS</span>
+              <span id="rad-badge" class="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">0.12 µSv/h</span>
+            </div>
+            <div class="flex items-baseline justify-between">
+              <span id="vitals-value" class="text-2xl font-display font-bold text-white">74 <span class="text-xs text-slate-500">BPM</span></span>
+              <span id="temp-value" class="text-xs font-mono text-slate-300">36.8°C / 98.2°F</span>
+            </div>
+            <div class="w-full bg-white/5 rounded-full h-1.5 mt-3 overflow-hidden">
+              <div id="vitals-bar" class="bg-rose-400 h-full rounded-full transition-all duration-300" style="width: 38%"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- MIDDLE COLUMN: Dynamic 10Hz Telemetry Oscilloscope (4 cols) -->
+        <div class="lg:col-span-4 card-tilt-3d p-5 flex flex-col justify-between border border-white/5 rounded-xl">
+          <div>
+            <div class="flex items-center justify-between mb-2 text-xs font-mono">
+              <span class="text-white font-semibold flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                LIVE 10Hz TELEMETRY STREAM
+              </span>
+              <div class="flex gap-3 text-slate-400 text-[10px]">
+                <span><span class="inline-block w-2 h-2 rounded-full bg-cyan-400 mr-1"></span>Gas</span>
+                <span><span class="inline-block w-2 h-2 rounded-full bg-amber-400 mr-1"></span>Accel</span>
+              </div>
+            </div>
+
+            <!-- Dynamic Chart.js Viewport -->
+            <div class="w-full h-64 relative bg-black/30 rounded-lg p-2 border border-white/5">
+              <canvas id="telemetryChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Environmental Scenarios Trigger -->
+          <div class="pt-3 border-t border-white/5 space-y-2">
+            <div class="text-[11px] font-mono text-slate-400">ATMOSPHERIC INJECTION:</div>
+            <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+              <button onclick="setSimState('gas')" class="px-2.5 py-1.5 rounded-lg bg-white/5 text-cyan-400 border border-white/10 hover:bg-white/10 transition text-[11px] text-center">
+                Methane/H2S Leak
+              </button>
+              <button onclick="setSimState('heat')" class="px-2.5 py-1.5 rounded-lg bg-white/5 text-amber-400 border border-white/10 hover:bg-white/10 transition text-[11px] text-center">
+                Heatstroke (39.6°C)
+              </button>
+            </div>
+
+            <div class="pt-2 flex items-center justify-between text-[11px] font-mono text-slate-400">
+              <span class="flex items-center gap-1"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-cyan-400"></i> UWB: <strong>X:142m, Y:-84m, Z:-390m</strong></span>
+              <span class="text-emerald-400">GNSS: 9 Sats Lock</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN: 3D HELMET SIMULATION VIEWPORT & SOS DISPATCH (4 cols) -->
+        <div class="lg:col-span-4 card-tilt-3d p-5 flex flex-col justify-between border border-white/10 rounded-xl relative overflow-hidden">
+          
+          <div>
+            <div class="flex items-center justify-between border-b border-white/5 pb-2.5 mb-2 text-xs font-mono">
+              <span class="text-amber-400 font-semibold flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+                3D HELMET PHYSICS SIMULATION
+              </span>
+              <span id="sos-live-indicator" class="text-slate-500 font-bold text-[10px]">STANDBY</span>
+            </div>
+
+            <!-- Three.js 3D Helmet Viewport directly in Mission Control -->
+            <div class="relative w-full h-52 rounded-xl bg-gradient-to-b from-brand-surface to-brand-dark flex items-center justify-center overflow-hidden cursor-grab active:cursor-grabbing border border-white/5 mb-3" id="sim-helmet-canvas">
+              <!-- Interactive 3D Model rendered here -->
+            </div>
+
+            <!-- Real-Time Dispatch Status -->
+            <div id="dispatch-banner" class="p-3 rounded-lg bg-emerald-950/40 border border-emerald-500/30 text-xs font-mono text-emerald-300 space-y-1">
+              <div id="dispatch-title" class="font-bold flex items-center gap-1.5 text-emerald-400">
+                <i data-lucide="shield-check" class="w-4 h-4"></i> NOMINAL SAFE
+              </div>
+              <div id="dispatch-desc" class="text-[10px] text-slate-400">Worker SW-001 operating within normal thresholds.</div>
+            </div>
+
+            <div class="mt-3 space-y-1 text-[11px] font-mono text-slate-400">
+              <div class="flex justify-between py-1 border-b border-white/5">
+                <span>Helmet Strobe:</span>
+                <span id="strobe-status-text" class="text-slate-200">White 10%</span>
+              </div>
+              <div class="flex justify-between py-1 border-b border-white/5">
+                <span>Mesh Audio Link:</span>
+                <span class="text-emerald-400">Open (Low Latency)</span>
+              </div>
+              <div class="flex justify-between py-1">
+                <span>Automated EMS:</span>
+                <span id="ems-status-text" class="text-slate-500">Standby</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- SOS Push Button (From BuildX / Person 2) -->
+          <div class="pt-3 border-t border-white/5 space-y-2">
+            <button id="sos-trigger-btn" onclick="toggleSOSState()" class="btn-shimmer w-full py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-mono font-bold text-xs uppercase tracking-wider shadow-lg transition flex items-center justify-center gap-2">
+              <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+              <span id="sos-btn-label">TRIGGER INDUSTRIAL SOS</span>
+            </button>
+            <button onclick="resetSimulation()" class="w-full py-1 text-[11px] font-mono text-slate-400 hover:text-white transition text-center">
+              Reset to Normal State
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Live Incident Stream Logs -->
+  <section class="py-6 border-t border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="card-tilt-3d p-4 font-mono text-xs border border-white/5 rounded-xl">
+        <div class="text-slate-400 uppercase font-semibold mb-2 flex items-center justify-between">
+          <span class="flex items-center gap-2"><i data-lucide="terminal" class="w-4 h-4 text-amber-400"></i> Event Telemetry Feed</span>
+          <span class="text-[10px] text-slate-500">AES-256 ENCRYPTED MESH LOGS</span>
+        </div>
+        <div id="sim-event-logs" class="space-y-1.5 max-h-32 overflow-y-auto text-slate-400 text-[11px]">
+          <div>[12:04:31] SYSTEM: ESP32 Dual-Core (FreeRTOS) telemetry link ready.</div>
+          <div>[12:04:45] SENSOR: Capacitive wear detection: HELMET WORN.</div>
+          <div>[12:05:02] GNSS: Satellite lock established — 9 Satellites (Site Zone B).</div>
+          <div>[12:05:10] RADIATION: Background monitoring nominal: 0.12 µSv/h.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="py-8 text-center text-xs font-mono text-slate-500">
+    &copy; 2026 SaniGuard Technologies Inc. Advanced Mission Control 3D Simulator.
+  </footer>
+
+  <script src="common.js"></script>
+  <script src="helmet3d.js"></script>
+  <script src="app.js"></script>
+  <script>
+    // -------------------------------------------------------------
+    // Synchronized 3D Physics & Live 10Hz Simulation Engine
+    // -------------------------------------------------------------
+    let isSOSActive = false;
+    let currentMotionPreset = 'NORMAL';
+
+    const MPU_PRESETS = {
+      NORMAL: {
+        accel: 1.0,
+        impact: false,
+        orientation: 'NORMAL',
+        desc: 'Standard upright posture, stationary baseline gravity (1.0g)',
+        badgeClass: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+        ax: '0.02g', ay: '0.04g', az: '1.01g', pitch: 1, roll: 2
+      },
+      WALKING: {
+        accel: 1.45,
+        impact: false,
+        orientation: 'NORMAL',
+        desc: 'Rhythmic worker locomotion, moderate acceleration spikes (1.4g)',
+        badgeClass: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+        ax: '0.35g', ay: '0.42g', az: '1.28g', pitch: 6, roll: 8
+      },
+      IMPACT: {
+        accel: 2.85,
+        impact: true,
+        orientation: 'NORMAL',
+        desc: 'Sudden mechanical bump or blunt helmet impact detected (2.8g)',
+        badgeClass: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+        ax: '1.95g', ay: '1.45g', az: '1.52g', pitch: 14, roll: 20
+      },
+      FALL: {
+        accel: 3.85,
+        impact: true,
+        orientation: 'ABNORMAL',
+        desc: 'Freefall & severe deceleration spike (3.8g) with abnormal posture / tilt',
+        badgeClass: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
+        ax: '2.85g', ay: '2.15g', az: '0.35g', pitch: 78, roll: 64
+      },
+      NO_MOVEMENT: {
+        accel: 0.15,
+        impact: false,
+        orientation: 'NORMAL',
+        desc: 'Prolonged inactivity / lack of micro-tremors (0.15g, potential man-down)',
+        badgeClass: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
+        ax: '0.01g', ay: '0.01g', az: '0.15g', pitch: 2, roll: 1
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initialize 3D Helmet Viewport in Simulator
+      if (window.initHelmet3D) {
+        window.initHelmet3D('sim-helmet-canvas', { initRotX: 0.1, initRotY: 0.35, autoRotate: false });
+      }
+    });
+
+    function setMotionPreset(presetKey, btn) {
+      currentMotionPreset = presetKey;
+      const p = MPU_PRESETS[presetKey];
+      if (!p) return;
+
+      document.querySelectorAll('.motion-btn').forEach(b => {
+        b.classList.remove('bg-emerald-500/20', 'border-emerald-500/40', 'bg-rose-500/20', 'border-rose-500/40', 'bg-amber-500/20', 'border-amber-500/40', 'bg-blue-500/20', 'border-blue-500/40', 'bg-purple-500/20', 'border-purple-500/40');
+        b.classList.add('bg-white/5', 'border-white/10');
+      });
+
+      if (btn) {
+        btn.classList.remove('bg-white/5', 'border-white/10');
+        btn.classList.add('bg-amber-500/20', 'border-amber-500/40', 'text-amber-400');
+      }
+
+      // Update 3D Helmet Simulation Physics
+      if (window.updateHelmetSimulation) {
+        const jerk = presetKey === 'IMPACT' ? 0.35 : (presetKey === 'FALL' ? 0.5 : 0);
+        window.updateHelmetSimulation(presetKey, p.pitch, p.roll, jerk);
+      }
+
+      // Sync with global telemetry engine
+      if (window.setTelemetryMotion) {
+        window.setTelemetryMotion(presetKey, p.accel);
+      }
+
+      // Update MPU values in UI
+      document.getElementById('impact-value').innerHTML = `${p.accel.toFixed(2)} <span class="text-xs text-slate-500">G</span>`;
+      document.getElementById('motion-state-badge').className = `px-2 py-0.5 rounded text-[10px] font-mono border ${p.badgeClass}`;
+      document.getElementById('motion-state-badge').innerText = `STATE: ${presetKey}`;
+      
+      document.getElementById('ax-val').innerText = p.ax;
+      document.getElementById('ay-val').innerText = p.ay;
+      document.getElementById('az-val').innerText = p.az;
+      document.getElementById('pitch-val').innerText = `${p.pitch}°`;
+      document.getElementById('roll-val').innerText = `${p.roll}°`;
+      
+      const orientElem = document.getElementById('orientation-text');
+      orientElem.innerText = `ORIENTATION: ${p.orientation}`;
+      orientElem.className = p.orientation === 'ABNORMAL' ? 'text-[10px] font-mono text-rose-400 font-bold animate-pulse' : 'text-[10px] font-mono text-emerald-400 font-semibold';
+
+      document.getElementById('impact-flag').innerText = p.impact ? 'Impact: YES' : 'Impact: NO';
+      document.getElementById('impact-flag').className = p.impact ? 'text-rose-400 font-bold' : 'text-slate-500';
+
+      // Audio alerts
+      if (presetKey === 'FALL' || presetKey === 'IMPACT') {
+        playAlarmSound();
+      } else {
+        playBeep(600, 0.04);
+      }
+
+      // If FALL, trigger dispatch banner
+      if (presetKey === 'FALL') {
+        document.getElementById('dispatch-title').innerHTML = '<i data-lucide="alert-triangle" class="w-4 h-4 text-rose-500"></i> MAN-DOWN FALL DETECTED';
+        document.getElementById('dispatch-title').className = 'font-bold flex items-center gap-1.5 text-rose-400';
+        document.getElementById('dispatch-desc').innerText = 'Worker sustained 3.8g deceleration with 78° tilt. SOS armed.';
+        document.getElementById('strobe-status-text').innerText = 'RAPID RED FLASH (100%)';
+        document.getElementById('strobe-status-text').className = 'text-rose-400 font-bold';
+      }
+
+      logEvent(`MOTION [${presetKey}]: Acceleration ${p.accel}g, Pitch: ${p.pitch}°, Roll: ${p.roll}°`);
+    }
+
+    function triggerGasSpike() {
+      if (window.setSimState) {
+        window.setSimState('gas');
+      }
+    }
+
+    function toggleSOSState() {
+      isSOSActive = !isSOSActive;
+      const btn = document.getElementById('sos-trigger-btn');
+      const label = document.getElementById('sos-btn-label');
+      const statusIndicator = document.getElementById('sos-live-indicator');
+
+      if (isSOSActive) {
+        playAlarmSound();
+        btn.className = 'btn-shimmer w-full py-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-black font-mono font-bold text-xs uppercase tracking-wider shadow-lg transition flex items-center justify-center gap-2';
+        label.innerText = 'CANCEL ACTIVE SOS';
+        statusIndicator.innerText = '● SOS ACTIVE';
+        statusIndicator.className = 'text-rose-400 font-bold animate-pulse';
+
+        if (window.updateHelmetSimulation) {
+          window.updateHelmetSimulation('SOS', 15, 10, 0.2);
+        }
+
+        document.getElementById('dispatch-title').innerHTML = '<i data-lucide="siren" class="w-4 h-4 text-rose-500"></i> CRITICAL WORKER SOS BEACON';
+        document.getElementById('dispatch-title').className = 'font-bold flex items-center gap-1.5 text-rose-400';
+        document.getElementById('dispatch-desc').innerText = 'Manual emergency distress button pressed by worker SW-001. Rescue team dispatched.';
+        document.getElementById('ems-status-text').innerText = 'EMS DISPATCHED';
+        document.getElementById('ems-status-text').className = 'text-rose-400 font-bold';
+        document.getElementById('strobe-status-text').innerText = 'SOS 3-PULSE RED STROBE';
+        document.getElementById('strobe-status-text').className = 'text-rose-400 font-bold';
+
+        logEvent('EMERGENCY SOS: Worker SW-001 triggered manual panic beacon. Location broadcasted.');
+      } else {
+        playBeep(400, 0.08);
+        btn.className = 'btn-shimmer w-full py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-mono font-bold text-xs uppercase tracking-wider shadow-lg transition flex items-center justify-center gap-2';
+        label.innerText = 'TRIGGER INDUSTRIAL SOS';
+        statusIndicator.innerText = 'STANDBY';
+        statusIndicator.className = 'text-slate-500 font-bold';
+        resetSimulation();
+        logEvent('EMERGENCY SOS: Distress beacon cancelled by worker/supervisor.');
+      }
+    }
+
+    function resetSimulation() {
+      isSOSActive = false;
+      setMotionPreset('NORMAL');
+      if (window.setSimState) window.setSimState('normal');
+      document.getElementById('dispatch-title').innerHTML = '<i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i> NOMINAL SAFE';
+      document.getElementById('dispatch-title').className = 'font-bold flex items-center gap-1.5 text-emerald-400';
+      document.getElementById('dispatch-desc').innerText = 'Worker SW-001 operating within standard parameters.';
+      document.getElementById('strobe-status-text').innerText = 'White 10%';
+      document.getElementById('strobe-status-text').className = 'text-slate-200';
+      document.getElementById('ems-status-text').innerText = 'Standby';
+      document.getElementById('ems-status-text').className = 'text-slate-500';
+      playBeep(500, 0.05);
+    }
+
+    function logEvent(msg) {
+      const logBox = document.getElementById('sim-event-logs');
+      if (logBox) {
+        const time = new Date().toLocaleTimeString();
+        logBox.innerHTML += `<div class="text-slate-300">[${time}] ${msg}</div>`;
+        logBox.scrollTop = logBox.scrollHeight;
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SaniGuard — Intelligent IoT Safety Helmet</title>
+  <meta name="description" content="SaniGuard is an advanced IoT-powered smart safety helmet engineered for extreme industrial environments. Real-time gas telemetry, impact detection, and subterranean mesh connectivity." />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            display: ['"Space Grotesk"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              400: '#fbbf24',
+              500: '#f59e0b',
+              dark: '#07090e',
+              surface: '#0c0f18',
+              card: '#111522',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="bg-brand-dark text-slate-200 antialiased overflow-x-hidden selection:bg-amber-400 selection:text-black">
+
+  <!-- Interactive Ambient Canvas & Background -->
+  <canvas id="ambient-canvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+
+  <!-- Minimalist Top Bar -->
+  <div class="relative z-50 border-b border-white/5 px-4 py-2 text-xs font-mono text-center flex items-center justify-center gap-3 bg-black/40 backdrop-blur-md text-slate-400">
+    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20 badge-floating">v3.2 RELEASE</span>
+    <span>SaniGuard IoT Industrial Helmet — Open for 30-Day Enterprise Pilots</span>
+    <a href="pilots.html" class="text-slate-200 hover:text-white underline underline-offset-4 ml-1 transition">Learn more &rarr;</a>
+    <button id="sound-toggle-btn" class="ml-4 text-amber-400 hover:text-white transition text-xs flex items-center gap-1" title="Toggle audio feedback">
+      <i data-lucide="volume-2" class="w-3.5 h-3.5"></i> Audio: ON
+    </button>
+  </div>
+
+  <!-- Minimalist Floating Header -->
+  <header class="sticky top-0 z-40 backdrop-blur-xl bg-brand-dark/80 border-b border-white/5 transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 py-3.5 flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <a href="index.html" class="flex items-center gap-2.5 group" onclick="playBeep(700, 0.04)">
+        <div class="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center text-black font-bold pulse-glow-amber">
+          <i data-lucide="shield" class="w-4 h-4 stroke-[2.5]"></i>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="font-display font-bold text-lg tracking-tight text-white">Sani<span class="text-amber-400">Guard</span></span>
+          <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-white/5 text-slate-400 border border-white/10">IoT</span>
+        </div>
+      </a>
+
+      <!-- Clean Minimal Nav Links -->
+      <nav class="hidden md:flex items-center gap-1 text-xs font-medium text-slate-400 bg-white/5 p-1 rounded-full border border-white/5">
+        <a href="index.html" class="nav-link px-3.5 py-1.5 rounded-full hover:text-white transition" onclick="playBeep(600, 0.03)">Home</a>
+        <a href="introduction.html" class="nav-link px-3.5 py-1.5 rounded-full hover:text-white transition" onclick="playBeep(600, 0.03)">Introduction</a>
+        <a href="product.html" class="nav-link px-3.5 py-1.5 rounded-full hover:text-white transition" onclick="playBeep(600, 0.03)">Hardware</a>
+        <a href="technology.html" class="nav-link px-3.5 py-1.5 rounded-full hover:text-white transition" onclick="playBeep(600, 0.03)">Mesh & AI</a>
+        <a href="industries.html" class="nav-link px-3.5 py-1.5 rounded-full hover:text-white transition" onclick="playBeep(600, 0.03)">Industries</a>
+        <a href="simulator.html" class="nav-link px-3.5 py-1.5 rounded-full text-emerald-400 hover:text-emerald-300 transition flex items-center gap-1" onclick="playBeep(750, 0.04)">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Simulator
+        </a>
+        <a href="pilots.html" class="nav-link px-3.5 py-1.5 rounded-full hover:text-white transition" onclick="playBeep(600, 0.03)">ROI & Pilots</a>
+      </nav>
+
+      <!-- Right Action CTA -->
+      <div class="hidden lg:flex items-center gap-3">
+        <a href="pilots.html" class="btn-shimmer px-4 py-2 rounded-full text-xs font-mono font-semibold bg-white text-black hover:bg-slate-200 transition flex items-center gap-1.5 shadow-lg">
+          Request Pilot Kit &rarr;
+        </a>
+      </div>
+
+      <!-- Mobile Button -->
+      <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg text-slate-400 hover:text-white">
+        <i data-lucide="menu" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <!-- Mobile Dropdown -->
+    <div id="mobile-menu" class="hidden md:hidden border-b border-white/5 bg-brand-surface px-4 py-4 space-y-2 text-xs font-mono">
+      <a href="index.html" class="block py-1.5 text-slate-200">Home</a>
+      <a href="introduction.html" class="block py-1.5 text-slate-200">Introduction</a>
+      <a href="product.html" class="block py-1.5 text-slate-200">Hardware & Sensors</a>
+      <a href="technology.html" class="block py-1.5 text-slate-200">Mesh & Edge-AI</a>
+      <a href="industries.html" class="block py-1.5 text-slate-200">Industries</a>
+      <a href="simulator.html" class="block py-1.5 text-emerald-400">Live Simulator</a>
+      <a href="pilots.html" class="block py-1.5 text-amber-400">ROI & Pilot Kit</a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="relative pt-16 pb-24 lg:pt-28 lg:pb-32 overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        
+        <!-- Left Hero Copy -->
+        <div class="lg:col-span-7 space-y-6 text-center lg:text-left reveal-on-scroll">
+          
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 backdrop-blur-md badge-floating">
+            <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+            <span class="font-mono text-xs text-amber-300 font-semibold tracking-wide uppercase">Mission-Critical Worker Telemetry</span>
+          </div>
+
+          <h1 class="font-display font-extrabold text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-[1.1] text-white">
+            Headwear Engineered to <span class="text-amber-400 underline decoration-amber-500/40 underline-offset-8">Predict Danger</span> in Hazardous Environments.
+          </h1>
+
+          <p class="text-base sm:text-lg text-slate-400 max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal">
+            SaniGuard equips frontline crews with continuous multi-gas telemetry, 6-axis fall detection, and subterranean mesh positioning that functions without cellular coverage.
+          </p>
+
+          <!-- 3D Tilt Metrics Counters -->
+          <div class="grid grid-cols-3 gap-3.5 py-2 max-w-md mx-auto lg:mx-0">
+            <div class="card-tilt-3d p-4 text-center">
+              <div class="font-display font-bold text-3xl text-white counter-val" data-target="0.2" data-suffix="s" data-decimals="1">0.0s</div>
+              <div class="text-[10px] font-mono text-slate-400 uppercase mt-1">SOS Trigger</div>
+            </div>
+            <div class="card-tilt-3d p-4 text-center">
+              <div class="font-display font-bold text-3xl text-white counter-val" data-target="84.5" data-suffix="%" data-decimals="1">0%</div>
+              <div class="text-[10px] font-mono text-slate-400 uppercase mt-1">Risk Drop</div>
+            </div>
+            <div class="card-tilt-3d p-4 text-center">
+              <div class="font-display font-bold text-3xl text-white counter-val" data-target="580" data-suffix="g" data-decimals="0">0g</div>
+              <div class="text-[10px] font-mono text-slate-400 uppercase mt-1">Ultralight</div>
+            </div>
+          </div>
+
+          <!-- CTAs -->
+          <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3.5 pt-2">
+            <a href="simulator.html" class="btn-shimmer w-full sm:w-auto px-7 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-semibold text-xs font-mono flex items-center justify-center gap-2 transition shadow-lg" onclick="playBeep(800, 0.05)">
+              <i data-lucide="activity" class="w-4 h-4 stroke-[2.5]"></i> Launch Live Simulator &rarr;
+            </a>
+            <a href="introduction.html" class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 text-white font-medium text-xs font-mono border border-white/10 flex items-center justify-center gap-2 transition" onclick="playBeep(600, 0.03)">
+              Product Introduction
+            </a>
+          </div>
+
+          <!-- Trust Standards -->
+          <div class="pt-4 border-t border-white/5 flex flex-wrap items-center justify-center lg:justify-start gap-5 text-xs text-slate-500 font-mono">
+            <span>OSHA 1926.100</span>
+            <span>•</span>
+            <span>ATEX Zone 0 (Ex ia)</span>
+            <span>•</span>
+            <span>ANSI/ISEA Z89.1</span>
+          </div>
+
+        </div>
+
+        <!-- Right 3D Interactive Laser-Scanned Helmet Viewport -->
+        <div class="lg:col-span-5 relative flex justify-center items-center reveal-on-scroll delay-100">
+          
+          <div class="relative w-full max-w-lg card-tilt-3d p-6 shadow-2xl laser-scan-container border border-white/10 rounded-2xl">
+            
+            <!-- Top Viewport Bar -->
+            <div class="flex items-center justify-between border-b border-white/5 pb-3 mb-3 text-xs font-mono text-slate-400">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <span class="text-white font-semibold">3D PBR MODEL // UNIT SG-8821</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <button onclick="window.toggleHelmetExplode && toggleHeroExplode(this)" id="hero-explode-btn" class="px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 text-[11px] hover:bg-amber-500/30 transition border border-amber-500/30 font-bold">
+                  Explode
+                </button>
+              </div>
+            </div>
+
+            <!-- Three.js 3D Interactive Canvas Viewport -->
+            <div class="relative w-full h-72 sm:h-80 rounded-xl bg-gradient-to-b from-brand-surface to-brand-dark flex items-center justify-center overflow-hidden cursor-grab active:cursor-grabbing" id="helmet-hero-canvas">
+              <!-- Three.js canvas will be mounted here -->
+            </div>
+
+            <!-- Floating Live Sensor Tags with Float Animation -->
+            <div class="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-white/5 text-[10px] font-mono text-center">
+              <div class="bg-white/5 p-2 rounded border border-white/5">
+                <span class="text-slate-500 block">ATMOSPHERE</span>
+                <strong class="text-emerald-400">O₂ 20.9% NOMINAL</strong>
+              </div>
+              <div class="bg-white/5 p-2 rounded border border-white/5">
+                <span class="text-slate-500 block">IMPACT IMU</span>
+                <strong class="text-white">1.00g (NORMAL)</strong>
+              </div>
+              <div class="bg-white/5 p-2 rounded border border-white/5">
+                <span class="text-slate-500 block">SUB-MESH</span>
+                <strong class="text-cyan-400">UWB LOCK</strong>
+              </div>
+            </div>
+
+            <!-- Camera & Color Switchers -->
+            <div class="mt-3 pt-2.5 border-t border-white/5 flex items-center justify-between text-xs font-mono text-slate-400">
+              <div class="flex items-center gap-1 text-[11px]">
+                <span>VIEW:</span>
+                <button onclick="window.setHelmetView && window.setHelmetView('perspective', 'helmet-hero-canvas')" class="px-1.5 py-0.5 rounded hover:bg-white/10 text-slate-300">3D</button>
+                <button onclick="window.setHelmetView && window.setHelmetView('front', 'helmet-hero-canvas')" class="px-1.5 py-0.5 rounded hover:bg-white/10 text-slate-300">Front</button>
+                <button onclick="window.setHelmetView && window.setHelmetView('side', 'helmet-hero-canvas')" class="px-1.5 py-0.5 rounded hover:bg-white/10 text-slate-300">Side</button>
+                <button onclick="window.setHelmetView && window.setHelmetView('top', 'helmet-hero-canvas')" class="px-1.5 py-0.5 rounded hover:bg-white/10 text-slate-300">Top</button>
+              </div>
+              <a href="product.html" class="text-amber-400 hover:underline flex items-center gap-1">Hardware Specs &rarr;</a>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 4 3D Tilt Pillars Grid -->
+  <section class="py-20 border-t border-white/5 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-2xl mx-auto mb-14 reveal-on-scroll">
+        <h2 class="font-display font-bold text-2xl sm:text-3xl text-white">The SaniGuard System</h2>
+        <p class="text-slate-400 text-xs sm:text-sm mt-2">Comprehensive protection engineered without compromises.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+        
+        <a href="introduction.html" class="card-tilt-3d p-6 flex flex-col justify-between group" onclick="playBeep(650, 0.03)">
+          <div>
+            <div class="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-amber-400 mb-4 group-hover:scale-110 transition-transform">
+              <i data-lucide="sparkles" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-display font-semibold text-lg text-white mb-1.5 group-hover:text-amber-400 transition">Introduction</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              The evolution of industrial headwear and SaniGuard’s 3 core pillars: Sense, Decide, and Connect.
+            </p>
+          </div>
+          <div class="mt-6 text-xs font-mono text-slate-500 group-hover:text-white transition">Read story &rarr;</div>
+        </a>
+
+        <a href="product.html" class="card-tilt-3d p-6 flex flex-col justify-between group" onclick="playBeep(650, 0.03)">
+          <div>
+            <div class="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-cyan-400 mb-4 group-hover:scale-110 transition-transform">
+              <i data-lucide="cpu" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-display font-semibold text-lg text-white mb-1.5 group-hover:text-amber-400 transition">Hardware & Sensors</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Exploded view of the quad-gas chamber, 6-axis IMU, OLED HUD, and 48h LiFePO4 battery pack.
+            </p>
+          </div>
+          <div class="mt-6 text-xs font-mono text-slate-500 group-hover:text-white transition">Inspect specs &rarr;</div>
+        </a>
+
+        <a href="technology.html" class="card-tilt-3d p-6 flex flex-col justify-between group" onclick="playBeep(650, 0.03)">
+          <div>
+            <div class="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-emerald-400 mb-4 group-hover:scale-110 transition-transform">
+              <i data-lucide="network" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-display font-semibold text-lg text-white mb-1.5 group-hover:text-amber-400 transition">Mesh & Edge-AI</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Subterranean LoRaWAN peer relay and on-edge algorithms predicting fatigue and gas spikes.
+            </p>
+          </div>
+          <div class="mt-6 text-xs font-mono text-slate-500 group-hover:text-white transition">View architecture &rarr;</div>
+        </a>
+
+        <a href="simulator.html" class="card-tilt-3d p-6 flex flex-col justify-between group" onclick="playBeep(750, 0.04)">
+          <div>
+            <div class="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-rose-400 mb-4 group-hover:scale-110 transition-transform">
+              <i data-lucide="activity" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-display font-semibold text-lg text-white mb-1.5 group-hover:text-amber-400 transition">Live Simulator</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Interactive Mission Control Center. Inject simulated gas leaks, high-G falls, and cardiac alarms.
+            </p>
+          </div>
+          <div class="mt-6 text-xs font-mono text-emerald-400 transition">Open simulator &rarr;</div>
+        </a>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Minimal Footer -->
+  <footer class="border-t border-white/5 py-12 relative z-10 font-mono text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2 text-slate-400">
+        <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+        <span>SaniGuard Technologies Inc.</span>
+      </div>
+      <div class="flex gap-5 text-slate-400">
+        <a href="introduction.html" class="hover:text-white">Introduction</a>
+        <a href="product.html" class="hover:text-white">Hardware</a>
+        <a href="simulator.html" class="hover:text-white">Simulator</a>
+        <a href="pilots.html" class="hover:text-white">Pilots</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="common.js"></script>
+  <script src="helmet3d.js"></script>
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.initHelmet3D) {
+        window.initHelmet3D('helmet-hero-canvas', { initRotX: 0.15, initRotY: 0.4 });
+      }
+    });
+
+    function toggleHeroExplode(btn) {
+      if (window.toggleHelmetExplode) {
+        const isExp = window.toggleHelmetExplode('helmet-hero-canvas');
+        btn.textContent = isExp ? 'Assemble' : 'Explode';
+        btn.classList.toggle('bg-amber-500/40', isExp);
+      }
+    }
+  </script>
+</body>
+</html>

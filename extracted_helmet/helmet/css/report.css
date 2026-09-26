@@ -1,0 +1,67 @@
+/* SMART SAFETY HELMET - SAFETY REPORT & WHITEPAPER */
+/* ==========================================================================
+   19. SAFETY REPORT (12 SUBSECTIONS WHITE-PAPER)
+   ========================================================================== */
+.report-container-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: 2.5rem;
+}
+
+.report-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.report-item {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: rgba(13, 18, 28, 0.6);
+  overflow: hidden;
+  transition: all var(--transition-fast);
+}
+
+.report-item.active {
+  border-color: var(--safety-yellow);
+  background: rgba(19, 27, 46, 0.85);
+}
+
+.report-header {
+  padding: 1.25rem 1.8rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.report-header-title {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.report-header-num {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--safety-yellow);
+  font-weight: 700;
+}
+
+.report-content {
+  padding: 0 1.8rem 1.5rem 1.8rem;
+  font-size: 0.94rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  display: none;
+}
+
+.report-item.active .report-content {
+  display: block;
+}
+
